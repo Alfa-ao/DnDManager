@@ -1,2 +1,62 @@
 # DnDManager
-DND - Менеджер по перетаскиванию окон (Виджеты) аддонов.
+
+DND Менеджер по перетаскиванию окон (Виджеты). Allods Online.
+
+## Установка
+
+- Скачать последний релиз - [Latest](https://github.com/Alfa-ao/DnDManager/releases/latest)
+- Поместить содержимое архива `DnDManager.zip\DnDManager-version\*` в папку `\data\Mods\Addons\_ИмяАддона_\Libs\DnDManager\`
+
+## Подключение
+
+Требуемые зависимости:
+
+```
+CoreScripts/ClassesImplementation
+```
+
+Отредактировать `AddonDesc.(UIAddon).xdb` и дополнить в содержимое атрибута `ScriptFileRefs`:
+
+```xml
+<Item href="/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua" /> <!-- CoreScripts OOP -->
+<Item href="Libs/DnDManager/src/DnDManager.lua" />
+```
+
+## Пример кода
+
+```lua
+local dndManager = DnDManager()
+
+dndManager:Init()
+
+dndManager:Register( wtPanel, { saveToConfig = true } )
+
+dndManager:Register( wtPanel2, { 
+    wtReacting = wtHeader
+    saveToConfig = true, 
+    Cursor = "drag" 
+} )
+```
+
+## Описание методов
+
+```lua
+DnDManagerSafe:Init( params: table|nil ): number
+```
+
+Выполняет первичную инициализацию менеджера Drag & Drop. Подготавливает внутреннее состояние менеджера, настройки, хранилище зарегистрированных виджетов и при необходимости автоматически подписывается на глобальные события `EVENT_DND_*`.
+
+### Параметры
+
+- **`params`** ( `table | nil` ) - Таблица включает в себя настройки с параметрами `autoRegisterEvents` и `configProvider`.
+    - **`autoRegisterEvents`** ( `boolean` ) - Автоматическое регистрирование событий `true`, или `false`, если нужно в ручную передать регистрацию. Методы для отвечающие за события:
+
+        ```lua
+        DnDManagerSafe:OnPickAttempt( params )
+        DnDManagerSafe:OnDragTo( params )
+        DnDManagerSafe:OnDropAttempt( params )
+        DnDManagerSafe:OnDragCancelled()
+        DnDManagerSafe:OnPosConverterChanged()
+        ```
+
+    - **`configProvider`** ( `table` ) - 
