@@ -60,3 +60,35 @@ DnDManagerSafe:Init( params: table|nil ): number
         ```
 
     - **`configProvider`** ( `table` ) - 
+
+```lua
+DnDManagerSafe:Register( wtMovable, options )
+```
+
+```lua
+DnDManagerSafe:Unregister( wtWidget )
+```
+
+```lua
+DnDManagerSafe:SetEnabled( wtWidget, isEnabled )
+```
+
+
+```lua
+DnDManagerSafe:AllocateDnDID( wtWidget )
+```
+
+
+```lua
+DnDManagerSafe:GetWidgetID( wtWidget )
+```
+
+
+```lua
+DnDManagerSafe:IsDragActive()
+```
+
+
+```lua
+DnDManagerSafe:UnregisterAllEvents()
+```
