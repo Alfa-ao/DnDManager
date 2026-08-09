@@ -277,6 +277,7 @@ DnDManagerSafe:UnregisterAllEvents()
 
 > [!WARNING]
 > Действие метода игнорируется, если события были зарегистрированы в ручную.
+> 
 > `autoRegisterEvents = false`
 
 
