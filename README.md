@@ -154,6 +154,12 @@ dndManager:Register( wtPanel, { saveToConfig = true } )
 dndManager:Register( wtPanel, { wtReacting = wtHeader } )
 ```
 
+Реагирование без нажатия клавиш:
+
+```lua
+dndManager:Register( wtPanel, { kbFlag = KBF_NONE } )
+```
+
 ---
 
 ### DnDManagerSafe:Unregister
