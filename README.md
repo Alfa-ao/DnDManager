@@ -59,33 +59,52 @@ DnDManagerSafe:Init( params: table|nil ): number
         DnDManagerSafe:OnPosConverterChanged()
         ```
 
-    - **`configProvider`** ( `table` ) - 
+        По умолчанию `true`.
+
+    - **`configProvider`** ( `table` ) - Провайдер кастомной конфигурации. По умолчанию:
+        - **`set`** ( `function` )
+
+            ```lua
+            set = function( section )
+                userMods.SetGlobalConfigSection( common.GetAddonName(), section )
+            end
+            ```
+            
+        - **`get`** ( `function` )
+        
+            ```lua
+            set = function( section )
+                userMods.SetGlobalConfigSection( common.GetAddonName(), section )
+            end
+            ```
+
+---
 
 ```lua
-DnDManagerSafe:Register( wtMovable, options )
+DnDManagerSafe:Register( wtMovable: Widget|TWidget, options: table|nil ): number
 ```
 
 ```lua
-DnDManagerSafe:Unregister( wtWidget )
+DnDManagerSafe:Unregister( wtWidget: Widget|TWidget )
 ```
 
 ```lua
-DnDManagerSafe:SetEnabled( wtWidget, isEnabled )
-```
-
-
-```lua
-DnDManagerSafe:AllocateDnDID( wtWidget )
+DnDManagerSafe:SetEnabled( wtWidget: Widget|TWidget, isEnabled: boolean ): boolean
 ```
 
 
 ```lua
-DnDManagerSafe:GetWidgetID( wtWidget )
+DnDManagerSafe:AllocateDnDID( wtWidget: Widget|TWidget ): number
 ```
 
 
 ```lua
-DnDManagerSafe:IsDragActive()
+DnDManagerSafe:GetWidgetID( wtWidget: Widget|TWidget ): number|nil
+```
+
+
+```lua
+DnDManagerSafe:IsDragActive(): boolean
 ```
 
 
