@@ -46,6 +46,10 @@ DnDManagerSafe:Init( params: table|nil ): number
 
 Выполняет первичную инициализацию менеджера Drag & Drop. Подготавливает внутреннее состояние менеджера, настройки, хранилище зарегистрированных виджетов и при необходимости автоматически подписывается на глобальные события `EVENT_DND_*`.
 
+> [!WARNING]
+> Выбрасывает исключение, если:
+> - Повторное использование `DnDManagerSafe:Init`
+
 ### Параметры
 
 - **`params`** ( `table | nil` ) - Таблица включает в себя настройки с параметрами `autoRegisterEvents` и `configProvider`.
@@ -78,15 +82,46 @@ DnDManagerSafe:Init( params: table|nil ): number
             end
             ```
 
-### Возвращаемые значения
+### Примеры
 
-`number` - Уникальный идентификатор виджета сгенерированный с помощью метода `DnDManagerSafe:AllocateDnDID`.
+```lua
+local dndManager = DnDManager()
+
+-- Отключить автоматическую подписку событий.
+-- Требуется в ручную управлять регистрацией методов, см. описание autoRegisterEvents.
+dndManager:Init( { autoRegisterEvents = false } )
+```
 
 ---
 
 ```lua
 DnDManagerSafe:Register( wtMovable: Widget|TWidget, options: table|nil ): number
 ```
+
+Регистрирует виджет в менеджере Drag & Drop и подключает его к системному механизму DND.
+
+> [!WARNING]
+> Выбрасывает исключение, если:
+> - Повторная регистрация одного и того же виджета запрещена.
+
+### Параметры
+
+- **`wtMovable`** ( `Widget | TWidget` ) - Виджет, который визуально перемещается.
+
+- **`options`** ( `table | nil` ) - Опционально. Зарегистрировать виджет с настройками.
+    - **`wtReacting`** ( `Widget | TWidget` ) - Виджет, который реагирует на системные DND-события. Если не указан, он считается равным `wtMovable`.
+    - **`saveToConfig`** ( `boolean` ) - По умолчанию `false`. `true` - позиция виджета будет сохраняться в конфигурацию аддона.
+    - **`lockedToParentArea`** ( `boolean` ) - По умолчанию `true` - это значит, что виджет будет ограничен областью родителя.
+    - **`padding`** ( `table` ) - Отступы { Top, Right, Bottom, Left }. По умолчанию: `{ 0, 0, 0, 0 }`.
+    - **`kbFlag`** ( `number` ) - Ограничение на реагирование с требованием одной из клавиш `KBF_*`. По умолчанию `false`, то есть без ограничений.
+    - **`cursor`** ( `string` ) - Курсор во время перетаскивания. См. названия курсоров `Аллоды Онлайн/data/Packs/Interface.Mini.pak/Interface/System/Cursors`. По умолчанию `default`. Имена курсоров в нижнем регистре. 
+    
+
+### Возвращаемые значения
+
+`number` - Уникальный идентификатор виджета сгенерированный с помощью метода `DnDManagerSafe:AllocateDnDID`.
+
+### Примеры
 
 ```lua
 DnDManagerSafe:Unregister( wtWidget: Widget|TWidget )
