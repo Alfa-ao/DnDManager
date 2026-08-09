@@ -54,7 +54,7 @@ DnDManagerSafe:Init( params: table|nil ): number
 > Выбрасывает исключение, если:
 > - Повторно инициализируется `DnDManagerSafe:Init`
 
-### Параметры
+#### Параметры
 
 - **`params`** ( `table | nil` ) - Таблица включает в себя настройки с параметрами `autoRegisterEvents` и `configProvider`.
     - **`autoRegisterEvents`** ( `boolean` ) - Автоматическое регистрирование событий `true`, или `false`, если нужно в ручную передать регистрацию. Методы для отвечающие за события:
@@ -86,7 +86,7 @@ DnDManagerSafe:Init( params: table|nil ): number
             end
             ```
 
-### Примеры
+#### Примеры
 
 ```lua
 local dndManager = DnDManager()
@@ -110,7 +110,7 @@ DnDManagerSafe:Register( wtMovable: Widget|TWidget, options: table|nil ): number
 > Выбрасывает исключение, если:
 > - Повторная регистрация одного и того же виджета.
 
-### Параметры
+#### Параметры
 
 - **`wtMovable`** ( `Widget | TWidget` ) - Виджет, который визуально перемещается.
 
@@ -123,11 +123,11 @@ DnDManagerSafe:Register( wtMovable: Widget|TWidget, options: table|nil ): number
     - **`cursor`** ( `string` ) - Курсор во время перетаскивания. См. названия курсоров `Аллоды Онлайн/data/Packs/Interface.Mini.pak/Interface/System/Cursors`. По умолчанию `default`. Имена курсоров в нижнем регистре. 
     
 
-### Возвращаемые значения
+#### Возвращаемые значения
 
 `number` - Уникальный идентификатор виджета сгенерированный с помощью метода `DnDManagerSafe:AllocateDnDID`.
 
-### Примеры
+#### Примеры
 
 Параметры по умолчанию:
 
@@ -170,11 +170,11 @@ DnDManagerSafe:Unregister( wtWidget: Widget|TWidget )
 
 Удаление виджета из менеджера
 
-### Параметры
+#### Параметры
 
 - **`wtWidget`** ( `Widget | TWidget` ) - Виджет, который удаляется из менеджера.
 
-### Примеры
+#### Примеры
 
 ```lua
 dndManager:Unregister( wtPanel )
@@ -190,13 +190,13 @@ DnDManagerSafe:SetEnabled( wtWidget: Widget|TWidget, isEnabled: boolean ): boole
 
 Включение/отключение возможности перетаскивания виджета
 
-### Параметры
+#### Параметры
 
 - **`wtWidget`** ( `Widget | TWidget` ) - Виджет.
 
 - **`isEnabled`** ( `boolean` ) - Включение/Выключение перетаскивание.
 
-### Примеры
+#### Примеры
 
 ```lua
 dndManager:SetEnabled( wtPanel, false )
@@ -212,12 +212,12 @@ DnDManagerSafe:AllocateDnDID( wtWidget: Widget|TWidget ): number
 
 Генерирует уникальный DnD ID для виджета.
 
-### Параметры
+#### Параметры
 
 - **`wtWidget`** ( `Widget | TWidget` ) - Виджет.
 
 
-### Возвращаемые значения
+#### Возвращаемые значения
 
 `number` - Уникальный идентификатор виджета.
 
@@ -235,15 +235,15 @@ DnDManagerSafe:GetWidgetID( wtWidget: Widget|TWidget ): number|nil
 info.wtReacting == wtWidget or info.wtMovable == wtWidget
 ```
 
-### Параметры
+#### Параметры
 
 - **`wtWidget`** ( `Widget | TWidget` ) - Виджет.
 
-### Возвращаемые значения
+#### Возвращаемые значения
 
 Возвращает `number` уникальный идентификатор виджета, иначе `nil`, если не найден.
 
-### Примеры
+#### Примеры
 
 ---
 
@@ -261,7 +261,7 @@ DnDManagerSafe:IsDragActive(): boolean
 - `EVENT_DND_DROP_ATTEMPT` - Успешное завершение перетаскивания.
 - `EVENT_DND_DRAG_CANCELLED` - Отмена перетаскивания.
 
-### Возвращаемые значения
+#### Возвращаемые значения
 
 Возвращает `true` если в данный момент есть активное перетаскивание, либо `false`.
 
