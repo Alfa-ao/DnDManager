@@ -52,7 +52,7 @@ DnDManagerSafe:Init( params: table|nil ): number
 
 > [!WARNING]
 > Выбрасывает исключение, если:
-> - Повторное использование `DnDManagerSafe:Init`
+> - Повторно инициализируется `DnDManagerSafe:Init`
 
 ### Параметры
 
