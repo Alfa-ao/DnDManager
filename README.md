@@ -83,7 +83,7 @@ DnDManagerSafe:Init( params: table|nil ): number
 #### Параметры
 
 - **`params`** ( `table | nil` ) - Таблица включает в себя настройки с параметрами `autoRegisterEvents` и `configProvider`.
-    - **`autoRegisterEvents`** ( `boolean` ) - Автоматическое регистрирование событий `true`, или `false`, если нужно в ручную передать регистрацию. Методы для отвечающие за события:
+    - **`autoRegisterEvents`** ( `boolean` ) - Автоматическое регистрирование событий `true`, или `false`, если нужно вручную передать регистрацию. Методы для отвечающие за события:
 
         ```lua
         DnDManagerSafe:OnPickAttempt( params )
@@ -118,7 +118,7 @@ DnDManagerSafe:Init( params: table|nil ): number
 local dndManager = DnDManager()
 
 -- Отключить автоматическую подписку событий.
--- Требуется в ручную управлять регистрацией методов, см. описание autoRegisterEvents.
+-- Требуется вручную управлять регистрацией методов, см. описание autoRegisterEvents.
 dndManager:Init( { autoRegisterEvents = false } )
 ```
 
