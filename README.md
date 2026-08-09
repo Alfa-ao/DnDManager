@@ -168,26 +168,115 @@ dndManager:Register( wtPanel, { kbFlag = KBF_NONE } )
 DnDManagerSafe:Unregister( wtWidget: Widget|TWidget )
 ```
 
+Удаление виджета из менеджера
+
+### Параметры
+
+- **`wtWidget`** ( `Widget | TWidget` ) - Виджет, который удаляется из менеджера.
+
+### Примеры
+
+```lua
+dndManager:Unregister( wtPanel )
+```
+
+---
+
+### DnDManagerSafe:SetEnabled
+
 ```lua
 DnDManagerSafe:SetEnabled( wtWidget: Widget|TWidget, isEnabled: boolean ): boolean
 ```
 
+Включение/отключение возможности перетаскивания виджета
+
+### Параметры
+
+- **`wtWidget`** ( `Widget | TWidget` ) - Виджет.
+
+- **`isEnabled`** ( `boolean` ) - Включение/Выключение перетаскивание.
+
+### Примеры
+
+```lua
+dndManager:SetEnabled( wtPanel, false )
+```
+
+---
+
+### DnDManagerSafe:AllocateDnDID
 
 ```lua
 DnDManagerSafe:AllocateDnDID( wtWidget: Widget|TWidget ): number
 ```
 
+Генерирует уникальный DnD ID для виджета.
+
+### Параметры
+
+- **`wtWidget`** ( `Widget | TWidget` ) - Виджет.
+
+
+### Возвращаемые значения
+
+`number` - Уникальный идентификатор виджета.
+
+---
+
+### DnDManagerSafe:GetWidgetID
 
 ```lua
 DnDManagerSafe:GetWidgetID( wtWidget: Widget|TWidget ): number|nil
 ```
 
+Ищет dndId по любому из связанных виджетов.
+
+```lua
+info.wtReacting == wtWidget or info.wtMovable == wtWidget
+```
+
+### Параметры
+
+- **`wtWidget`** ( `Widget | TWidget` ) - Виджет.
+
+### Возвращаемые значения
+
+Возвращает `number` уникальный идентификатор виджета, иначе `nil`, если не найден.
+
+### Примеры
+
+---
+
+### DnDManagerSafe:IsDragActive
 
 ```lua
 DnDManagerSafe:IsDragActive(): boolean
 ```
 
+Возвращает `boolean`, находится ли менеджер Drag & Drop в состоянии активного перетаскивания.
+
+Активное перетаскивание считается активным с момента успешного начала drag-операции после обработки `EVENT_DND_PICK_ATTEMPT` и до момента завершения или отмены перетаскивания.
+
+Завершение происходит через:
+- EVENT_DND_DROP_ATTEMPT - успешное завершение перетаскивания;
+- EVENT_DND_DRAG_CANCELLED - отмена перетаскивания.
+
+### Возвращаемые значения
+
+Возвращает `true` если в данный момент есть активное перетаскивание, либо `false`.
+
+---
+
+### DnDManagerSafe:UnregisterAllEvents
 
 ```lua
 DnDManagerSafe:UnregisterAllEvents()
 ```
+
+Полностью отписывает менеджер Drag & Drop от всех глобальных событий, которые были зарегистрированы.
+
+> [!WARNING]
+> Действие метода игнорируется, если события были зарегистрированы в ручную.
+> `autoRegisterEvents = false`
+
+
