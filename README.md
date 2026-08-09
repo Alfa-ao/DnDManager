@@ -9,11 +9,11 @@ DND Менеджер по перетаскиванию окон (Виджеты)
 
 ## Подключение
 
-Требуемые зависимости:
-
-```
-CoreScripts/ClassesImplementation
-```
+> [!WARNING]
+> Требуемые зависимости:
+> ```
+> CoreScripts/ClassesImplementation
+> ```
 
 Отредактировать `AddonDesc.(UIAddon).xdb` и дополнить в содержимое атрибута `ScriptFileRefs`:
 
@@ -34,7 +34,7 @@ dndManager:Register( wtPanel, { saveToConfig = true } )
 dndManager:Register( wtPanel2, { 
     wtReacting = wtHeader
     saveToConfig = true, 
-    Cursor = "drag" 
+    cursor = "drag" 
 } )
 ```
 
@@ -73,10 +73,14 @@ DnDManagerSafe:Init( params: table|nil ): number
         - **`get`** ( `function` )
         
             ```lua
-            set = function( section )
-                userMods.SetGlobalConfigSection( common.GetAddonName(), section )
+            get = function()
+                return userMods.GetGlobalConfigSection( common.GetAddonName() ) -- table|nil
             end
             ```
+
+### Возвращаемые значения
+
+`number` - Уникальный идентификатор виджета сгенерированный с помощью метода `DnDManagerSafe:AllocateDnDID`.
 
 ---
 
