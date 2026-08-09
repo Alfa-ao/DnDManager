@@ -5,7 +5,7 @@ DND Менеджер по перетаскиванию окон (Виджеты)
 ## Установка
 
 - Скачать последний релиз - [Latest](https://github.com/Alfa-ao/DnDManager/releases/latest)
-- Поместить содержимое архива `DnDManager.zip\DnDManager-version\*` в папку `\data\Mods\Addons\_ИмяАддона_\Libs\DnDManager\`
+- Поместить содержимое архива `DnDManager.zip\DnDManager-version\*` в папку `\data\Mods\Addons\_ИмяАддона_\Libs\DND\`
 
 ## Подключение
 
@@ -19,7 +19,7 @@ DND Менеджер по перетаскиванию окон (Виджеты)
 
 ```xml
 <Item href="/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua" /> <!-- CoreScripts OOP -->
-<Item href="Libs/DnDManager/src/DnDManager.lua" />
+<Item href="Libs/DND/src/DnDManager.lua" />
 ```
 
 ## Пример кода
@@ -57,6 +57,13 @@ function DnDManagerExtends:Init( params )
     -- Вызов родительского Init
     -- DnDManager.Init( self, params )
 end
+```
+
+Последовательность подключения:
+
+```xml
+<Item href="Libs/DND/src/DnDManager.lua" />
+<Item href="Scripts/DnDManagerExtends.lua" />
 ```
 
 ## Описание методов
