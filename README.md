@@ -32,13 +32,17 @@ dndManager:Init()
 dndManager:Register( wtPanel, { saveToConfig = true } )
 
 dndManager:Register( wtPanel2, { 
-    wtReacting = wtHeader
+    wtReacting = wtHeader,
     saveToConfig = true, 
     cursor = "drag" 
 } )
 ```
 
+---
+
 ## Описание методов
+
+### DnDManagerSafe:Init
 
 ```lua
 DnDManagerSafe:Init( params: table|nil ): number
@@ -94,6 +98,8 @@ dndManager:Init( { autoRegisterEvents = false } )
 
 ---
 
+### DnDManagerSafe:Register
+
 ```lua
 DnDManagerSafe:Register( wtMovable: Widget|TWidget, options: table|nil ): number
 ```
@@ -102,7 +108,7 @@ DnDManagerSafe:Register( wtMovable: Widget|TWidget, options: table|nil ): number
 
 > [!WARNING]
 > Выбрасывает исключение, если:
-> - Повторная регистрация одного и того же виджета запрещена.
+> - Повторная регистрация одного и того же виджета.
 
 ### Параметры
 
@@ -122,6 +128,35 @@ DnDManagerSafe:Register( wtMovable: Widget|TWidget, options: table|nil ): number
 `number` - Уникальный идентификатор виджета сгенерированный с помощью метода `DnDManagerSafe:AllocateDnDID`.
 
 ### Примеры
+
+Параметры по умолчанию:
+
+```lua
+dndManager:Register( wtPanel, { 
+    wtReacting = wtPanel,
+    saveToConfig = false,
+    lockedToParentArea = true,
+    padding = { 0, 0, 0, 0 },
+    kbFlag = false,
+    cursor = "default" 
+} )
+```
+
+Сохранение позиции виджета в конфиге:
+
+```lua
+dndManager:Register( wtPanel, { saveToConfig = true } )
+```
+
+Перетаскивание окна виджета только по заголовку:
+
+```lua
+dndManager:Register( wtPanel, { wtReacting = wtHeader } )
+```
+
+---
+
+### DnDManagerSafe:Unregister
 
 ```lua
 DnDManagerSafe:Unregister( wtWidget: Widget|TWidget )
