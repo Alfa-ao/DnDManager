@@ -83,6 +83,7 @@ DnDManagerSafe:Init( params: table|nil ): number
 #### Параметры
 
 - **`params`** ( `table | nil` ) - Таблица включает в себя настройки с параметрами `autoRegisterEvents` и `configProvider`.
+    - **`defaultCursor`** ( `string` ) - Глобально принять курсор по умолчанию. Базовое значение `default`.
     - **`autoRegisterEvents`** ( `boolean` ) - Автоматическое регистрирование событий `true`, или `false`, если нужно вручную передать регистрацию. Методы для отвечающие за события:
 
         ```lua
@@ -144,9 +145,9 @@ DnDManagerSafe:Register( wtMovable: Widget|TWidget, options: table|nil ): number
     - **`wtReacting`** ( `Widget | TWidget` ) - Виджет, который реагирует на системные DND-события. Если не указан, он считается равным `wtMovable`.
     - **`saveToConfig`** ( `boolean` ) - По умолчанию `false`. `true` - позиция виджета будет сохраняться в конфигурацию аддона.
     - **`lockedToParentArea`** ( `boolean` ) - По умолчанию `true` - это значит, что виджет будет ограничен областью родителя.
-    - **`padding`** ( `table` ) - Отступы { Top, Right, Bottom, Left }. По умолчанию: `{ 0, 0, 0, 0 }`.
+    - **`padding`** ( `table` ) - Строго ожидает таблицу. Отступы { Top, Right, Bottom, Left }. По умолчанию: `{ 0, 0, 0, 0 }`.
     - **`kbFlag`** ( `number` ) - Ограничение на реагирование с требованием одной из клавиш `KBF_*`. По умолчанию `false`, то есть без ограничений.
-    - **`cursor`** ( `string` ) - Курсор во время перетаскивания. См. названия курсоров `Аллоды Онлайн/data/Packs/Interface.Mini.pak/Interface/System/Cursors`. По умолчанию `default`. Имена курсоров в нижнем регистре. 
+    - **`cursor`** ( `string` ) - Курсор во время перетаскивания. См. названия курсоров `Аллоды Онлайн/data/Packs/Interface.Mini.pak/Interface/System/Cursors`. По умолчанию `default`, или `defaultCursor` если установлен. Имена курсоров в нижнем регистре. 
     
 
 #### Возвращаемые значения
