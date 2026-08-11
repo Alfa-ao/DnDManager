@@ -135,7 +135,9 @@ DnDManagerSafe:Register( wtMovable: Widget|TWidget, options: table|nil ): number
 
 > [!WARNING]
 > Выбрасывает исключение, если:
+> - Вызов метода без первичной инициализации `Init`.
 > - Повторная регистрация одного и того же виджета.
+> - Виджет уже зарегистрирован в DND-системе, но не менеджером.
 
 #### Параметры
 
@@ -215,7 +217,11 @@ dndManager:Unregister( wtPanel )
 DnDManagerSafe:SetEnabled( wtWidget: Widget|TWidget, isEnabled: boolean ): boolean
 ```
 
-Включение/отключение возможности перетаскивания виджета
+Включение/отключение возможности перетаскивания виджета.
+
+> [!WARNING]
+> Выбрасывает исключение, если:
+> - Виджет wtWidget не зарегистрирован в менеджере.
 
 #### Параметры
 
