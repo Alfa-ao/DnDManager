@@ -165,7 +165,7 @@ dndManager:Register( wtPanel, {
     lockedToParentArea = true,
     padding = { 0, 0, 0, 0 },
     kbFlag = false,
-    cursor = "default" 
+    cursor = dndManager._options.defaultCursor -- "default" 
 } )
 ```
 
