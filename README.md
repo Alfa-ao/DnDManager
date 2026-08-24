@@ -120,7 +120,7 @@ local dndManager = DnDManager()
 
 -- Отключить автоматическую подписку событий.
 -- Требуется вручную управлять регистрацией методов, см. описание autoRegisterEvents.
-dndManager:Init( { autoRegisterEvents = false } )
+dndManager:Init { autoRegisterEvents = false }
 ```
 
 ---
