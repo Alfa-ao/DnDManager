@@ -38,34 +38,7 @@ dndManager:Register( wtPanel2, {
 } )
 ```
 
-## DnDManagerExtends
-
-Расширение класса `DnDManager` с возможностью переопределения методов.
-
-Класс служит примером кастомизации поведения менеджера Drag & Drop.  
-Вся дополнительная или изменённая логика должна добавляться здесь, через наследование и переопределение методов, без правки базового `DnDManager`, чтобы не ломать исходную логику и не превращать базовый класс в **`Говнокод`**.
-
-```lua
-Class( "DnDManagerExtends", DnDManager() )
-
---------------------------------------------------------------------------------
---- @param params table|nil
---------------------------------------------------------------------------------
-function DnDManagerExtends:Init( params )
-    error( "Overrides DnDManager:Init to provide custom logic." ) -- Переопределение метода для кастомной логики.
-    
-    -- Вызов родительского Init
-    -- DnDManager.Init( self, params )
-end
-```
-
-Последовательность подключения:
-
-```xml
-<Item href="Libs/DND/src/DnDManager.lua" />
-<Item href="Scripts/DnDManagerExtends.lua" />
-```
-
 ## Смотрите также
 
 - [Описание методов](https://github.com/Alfa-ao/DnDManager/wiki/Описание-методов)
+- [Расширение класса](https://github.com/Alfa-ao/DnDManager/wiki/Расширение-класса)
