@@ -12,13 +12,16 @@ DND Менеджер по перетаскиванию окон (Виджеты)
 > [!WARNING]
 > Требуемые зависимости:
 > ```
+> CoreScripts/AddonBase
 > CoreScripts/ClassesImplementation
 > ```
 
 Отредактировать `AddonDesc.(UIAddon).xdb` и дополнить в содержимое атрибута `ScriptFileRefs`:
 
 ```xml
-<Item href="/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua" /> <!-- CoreScripts OOP -->
+<Item href="/Mods/SampleCommon/CoreScripts/AddonBaseUserMods.lua" />
+<Item href="/Mods/SampleCommon/CoreScripts/AddonBase.lua" />
+<Item href="/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua" />
 <Item href="Libs/DND/src/DnDManager.lua" />
 ```
 
