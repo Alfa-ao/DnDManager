@@ -5,6 +5,8 @@
 --[[
 <ScriptFileRefs>
     <Item href="/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua" />
+    <Item href="/Mods/SampleCommon/CoreScripts/AddonBaseUserMods.lua" />
+    <Item href="/Mods/SampleCommon/CoreScripts/AddonBase.lua" />
     <Item href="/Mods/SampleCommon/CoreScripts/WidgetCoreUserMods.lua" />
     <Item href="/Mods/SampleCommon/CoreScripts/AdvancedHandlersUserMods.lua" />
 </ScriptFileRefs>
