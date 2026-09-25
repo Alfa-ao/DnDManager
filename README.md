@@ -23,6 +23,7 @@ DND Менеджер по перетаскиванию окон (Виджеты)
     <Item href="/Mods/SampleCommon/CoreScripts/AddonBase.lua" />
     <Item href="/Mods/SampleCommon/CoreScripts/WidgetCoreUserMods.lua" />
     <Item href="/Mods/SampleCommon/CoreScripts/AdvancedHandlersUserMods.lua" />
+    <Item href="DnDManager.lua" />
 </ScriptFileRefs>
 ```
 
