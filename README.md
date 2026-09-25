@@ -10,7 +10,9 @@ DND Менеджер по перетаскиванию окон (Виджеты)
 
 > [!WARNING]
 > Требуемые зависимости:
-> - CoreScripts
+> ```
+> CoreScripts
+> ```
 
 Отредактировать `AddonDesc.(UIAddon).xdb` и дополнить в содержимое атрибута `ScriptFileRefs`:
 
