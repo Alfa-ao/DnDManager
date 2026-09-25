@@ -5,24 +5,25 @@ DND Менеджер по перетаскиванию окон (Виджеты)
 ## Установка
 
 - Скачать последний релиз - [Latest](https://github.com/Alfa-ao/DnDManager/releases/latest)
-- Поместить содержимое архива `DnDManager.zip\DnDManager-version\*` в папку `\data\Mods\Addons\_ИмяАддона_\Libs\DND\`
 
 ## Подключение
 
 > [!WARNING]
 > Требуемые зависимости:
 > ```
-> CoreScripts/AddonBase
-> CoreScripts/ClassesImplementation
+> CoreScripts
 > ```
 
 Отредактировать `AddonDesc.(UIAddon).xdb` и дополнить в содержимое атрибута `ScriptFileRefs`:
 
 ```xml
-<Item href="/Mods/SampleCommon/CoreScripts/AddonBaseUserMods.lua" />
-<Item href="/Mods/SampleCommon/CoreScripts/AddonBase.lua" />
-<Item href="/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua" />
-<Item href="Libs/DND/src/DnDManager.lua" />
+<ScriptFileRefs>
+    <Item href="/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua" />
+    <Item href="/Mods/SampleCommon/CoreScripts/AddonBaseUserMods.lua" />
+    <Item href="/Mods/SampleCommon/CoreScripts/AddonBase.lua" />
+    <Item href="/Mods/SampleCommon/CoreScripts/WidgetCoreUserMods.lua" />
+    <Item href="/Mods/SampleCommon/CoreScripts/AdvancedHandlersUserMods.lua" />
+</ScriptFileRefs>
 ```
 
 ## Пример кода
