@@ -911,10 +911,7 @@ function DnDManager:_LoadConfig( info )
     
     if info.lockedToParentArea then
         local limits = self:_PrepareLimits( info, plc )
-
-        if limits and limits.min and limits.max then
-            plc = self:_NormalizePlacement( plc, limits.min, limits.max )
-        end
+        plc = self:_NormalizePlacement( plc, limits.min, limits.max )
     end
 
     info.wtMovable:SetPlacementPlain( plc )
