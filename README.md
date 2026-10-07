@@ -1,30 +1,13 @@
 # DnDManager
 
-DND Менеджер по перетаскиванию окон (Виджеты). Allods Online.
-
-## Установка
-
-- Скачать последний релиз - [Latest](https://github.com/Alfa-ao/DnDManager/releases/latest)
+DND Менеджер по перетаскиванию окон (Виджеты). Аллоды Онлайн.
 
 ## Подключение
 
-> [!WARNING]
-> Требуемые зависимости:
-> ```
-> CoreScripts
-> ```
+[**ForgePackage**](https://github.com/Alfa-ao/ForgePackage)
 
-Отредактировать `AddonDesc.(UIAddon).xdb` и дополнить в содержимое атрибута `ScriptFileRefs`:
-
-```xml
-<ScriptFileRefs>
-    <Item href="/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua" />
-    <Item href="/Mods/SampleCommon/CoreScripts/AddonBaseUserMods.lua" />
-    <Item href="/Mods/SampleCommon/CoreScripts/AddonBase.lua" />
-    <Item href="/Mods/SampleCommon/CoreScripts/WidgetCoreUserMods.lua" />
-    <Item href="/Mods/SampleCommon/CoreScripts/AdvancedHandlersUserMods.lua" />
-    <Item href="DnDManager.lua" />
-</ScriptFileRefs>
+```
+require Alfa-ao/DnDManager
 ```
 
 ## Пример кода
