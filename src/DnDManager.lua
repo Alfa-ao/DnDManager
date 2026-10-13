@@ -1,66 +1,8 @@
 --------------------------------------------------------------------------------
 -- src/DnDManager.lua
 -- ООП менеджер Drag & Drop для виджетов.
--- Требует зависимость: 
---[[
-<ScriptFileRefs>
-    <Item href="/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua" />
-    <Item href="/Mods/SampleCommon/CoreScripts/AddonBaseUserMods.lua" />
-    <Item href="/Mods/SampleCommon/CoreScripts/AddonBase.lua" />
-    <Item href="/Mods/SampleCommon/CoreScripts/WidgetCoreUserMods.lua" />
-    <Item href="/Mods/SampleCommon/CoreScripts/AdvancedHandlersUserMods.lua" />
-</ScriptFileRefs>
-]]
+-- ForgePackage "require Alfa-ao/DnDManager"
 --------------------------------------------------------------------------------
---[[ 
-
-Таблица из метода wtMovable:GetPlacementPlain():
-table(WidgetPlacementLua:10) {
-    -- Тип выравнивания.
-    -- Значения: number (WIDGET_ALIGN_LOW(0) | WIDGET_ALIGN_HIGH(1) | WIDGET_ALIGN_CENTER(2) | WIDGET_ALIGN_BOTH(3) | WIDGET_ALIGN_LOW_ABS(4))
-    -- По умолчанию (alignX / alignY): number(WIDGET_ALIGN_LOW(0)) 
-    ["alignX"] => number(WIDGET_ALIGN_LOW(0)) 
-    ["alignY"] => number(WIDGET_ALIGN_LOW(0))
-    
-    -- Смещение относительно родителя (или ребенка при WIDGET_SIZING_CHILDREN) по ПРАВОМУ / НИЖНЕМУ краю.
-    -- Значения: number (float)
-    -- Смещение (highPosX / highPosY) действует только при значении (alignX / alignY): WIDGET_ALIGN_HIGH(1) или WIDGET_ALIGN_BOTH(3)
-    -- По умолчанию (highPosX / highPosY): number(0)
-    ["highPosX"] => number(0)
-    ["highPosY"] => number(0)
-    
-    -- Смещение относительно родителя (или ребенка при WIDGET_SIZING_CHILDREN) по ЛЕВОМУ / ВЕРХНЕМУ краю.
-    -- Значения: number (float)
-    -- Игнорируется при выравнивании (alignX / alignY): WIDGET_ALIGN_HIGH(1)
-    -- По умолчанию (posX / posY): number(0)
-    ["posX"] => number(0)
-    ["posY"] => number(0)
-    
-    -- Размер ширины и высоты виджета.
-    -- Значения: number (float)
-    -- Игнорируется при выравнивании (alignX / alignY): WIDGET_ALIGN_BOTH(3)
-    -- Игнорируется при масштабировании (sizingX / sizingY): WIDGET_SIZING_INTERNAL(1) или WIDGET_SIZING_CHILDREN(2)
-    -- По умолчанию (sizeX / sizeY): number(0)
-    ["sizeX"] => number(0)
-    ["sizeY"] => number(0)
-    
-    -- Тип масштабирования.
-    -- Значения: number (WIDGET_SIZING_DEFAULT(0) | WIDGET_SIZING_INTERNAL(1) | WIDGET_SIZING_CHILDREN(2))
-    -- По умолчанию (sizingX / sizingY): number (WIDGET_SIZING_DEFAULT(0))
-    ["sizingX"] => number(WIDGET_SIZING_DEFAULT(0))
-    ["sizingY"] => number(WIDGET_SIZING_DEFAULT(0))
-}
-
-Таблица из функции common.GetPosConverterParams():
-table(6) {
-    ["fullVirtualSizeX"] => number(1920) - динамично по размеру экрана
-    ["fullVirtualSizeY"] => number(1080) - динамично по размеру экрана
-    ["realSizeX"] => number(777) - Размер окна реальный в пикселях
-    ["realSizeY"] => number(777) - Размер окна реальный в пикселях
-    ["referenceVirtualSizeX"] => number(1920) - эталон
-    ["referenceVirtualSizeY"] => number(1080) - эталон
-}
- ]]
 
 --- @class DnDManager
 --- @field _widgets table Хранилище зарегистрированных виджетов [ dndId ] = WidgetInfo
@@ -152,7 +94,6 @@ end
 --- @field wtReacting userdata|table|nil Виджет, на котором реагирует DnD.
 --- @field saveToConfig boolean|nil Использовать конфиг для сохранения позиции.
 --- @field lockedToParentArea boolean|nil Ограничивать ли перемещение областью родителя.
---- @field padding table|nil Отступы { T, R, B, L }.
 --- @field kbFlag number|nil Флаг клавиш KBF_*.
 --- @field cursor string|nil Курсор во время перетаскивания. См. названия курсоров "Аллоды Онлайн/data/Packs/Interface.Mini.pak/Interface/System/Cursors"
 
@@ -195,7 +136,6 @@ function DnDManager:Register( wtMovable, options )
         lockedToParentArea = options.lockedToParentArea ~= false, -- По умолчанию true.
         kbFlag = type( options.kbFlag ) == "number" and options.kbFlag or false,     -- По умолчанию false. Ограничения отключены.
         cursor = cursor,                                          -- По умолчанию "default". Имена в нижнем регистре.
-        padding = self:_NormalizePadding( options.padding ),      -- { T, R, B, L }
         configName = nil,
     }
 
@@ -544,25 +484,6 @@ end
 
 
 --------------------------------------------------------------------------------
---- Проверяет и выводит padding в формате { T, R, B, L }.
---- @param padding table|nil Отступы: { T, R, B, L }.
---- @return table
---------------------------------------------------------------------------------
-function DnDManager:_NormalizePadding( padding )
-    if padding == nil then
-        return { 0, 0, 0, 0 }
-    end
-
-    for i = 1, 4 do
-        assert( type( padding[ i ] ) == "number", "DnDManager: padding[ %d ] must be a number or nil", i )
-    end
-    
-    return padding
-end
-
-
-
---------------------------------------------------------------------------------
 --- Событие: Отпускание кнопки мыши
 --- @param params table Параметры события EVENT_DND_DROP_ATTEMPT.
 --------------------------------------------------------------------------------
@@ -664,7 +585,7 @@ end
 
 
 --------------------------------------------------------------------------------
---- Расчёт границ родителя ( limitMin, limitMax ) с учётом alignX / alignY и padding.
+--- Расчёт границ родителя ( limitMin, limitMax ) с учётом alignX / alignY
 --- @param info table Информация о зарегистрированном виджете.
 --- @param place table|nil WidgetPlacement. Если nil, берётся текущий placement виджета.
 --- @return table limits { min = limitMin, max = limitMax }
@@ -674,8 +595,6 @@ function DnDManager:_PrepareLimits( info, place )
 
     local screen = self._screenParams
     local ParentSize = self:_GetParentRealSize( info.wtMovable )
-
-    local padding = info.padding or { 0, 0, 0, 0 }
 
     local sizeX = place.sizeX or 0
     local sizeY = place.sizeY or 0
@@ -688,29 +607,26 @@ function DnDManager:_PrepareLimits( info, place )
     ------------------------------------------------------------------------
 
     if place.alignX == WIDGET_ALIGN_LOW then
-        limitMin.posX = padding[4]
-        limitMax.posX = ParentSize.sizeX - sizeX - padding[2]
+        limitMin.posX = 0
+        limitMax.posX = ParentSize.sizeX - sizeX
 
     elseif place.alignX == WIDGET_ALIGN_HIGH then
-        limitMin.highPosX = padding[2]
-        limitMax.highPosX = ParentSize.sizeX - sizeX - padding[4]
+        limitMin.highPosX = 0
+        limitMax.highPosX = ParentSize.sizeX - sizeX
 
     elseif place.alignX == WIDGET_ALIGN_CENTER then
-        limitMin.posX = sizeX / 2 - ParentSize.sizeX / 2 + padding[4]
-        limitMax.posX = ParentSize.sizeX / 2 - sizeX / 2 - padding[2]
+        limitMin.posX = sizeX / 2 - ParentSize.sizeX / 2
+        limitMax.posX = ParentSize.sizeX / 2 - sizeX / 2
 
     elseif place.alignX == WIDGET_ALIGN_BOTH then
-        limitMin.posX = padding[4]
-        limitMin.highPosX = padding[2]
+        limitMin.posX = 0
+        limitMin.highPosX = 0
 
     elseif place.alignX == WIDGET_ALIGN_LOW_ABS then
-        limitMin.posX =
-            padding[4]
-            * screen.realSizeX
-            / screen.fullVirtualSizeX
+        limitMin.posX = 0
 
         limitMax.posX =
-            ( ParentSize.sizeX - sizeX - padding[2] )
+            ( ParentSize.sizeX - sizeX )
             * screen.realSizeX
             / screen.fullVirtualSizeX
     end
@@ -720,29 +636,26 @@ function DnDManager:_PrepareLimits( info, place )
     ------------------------------------------------------------------------
 
     if place.alignY == WIDGET_ALIGN_LOW then
-        limitMin.posY = padding[1]
-        limitMax.posY = ParentSize.sizeY - sizeY - padding[3]
+        limitMin.posY = 0
+        limitMax.posY = ParentSize.sizeY - sizeY
 
     elseif place.alignY == WIDGET_ALIGN_HIGH then
-        limitMin.highPosY = padding[3]
-        limitMax.highPosY = ParentSize.sizeY - sizeY - padding[1]
+        limitMin.highPosY = 0
+        limitMax.highPosY = ParentSize.sizeY - sizeY
 
     elseif place.alignY == WIDGET_ALIGN_CENTER then
-        limitMin.posY = sizeY / 2 - ParentSize.sizeY / 2 + padding[1]
-        limitMax.posY = ParentSize.sizeY / 2 - sizeY / 2 - padding[3]
+        limitMin.posY = sizeY / 2 - ParentSize.sizeY / 2
+        limitMax.posY = ParentSize.sizeY / 2 - sizeY / 2
 
     elseif place.alignY == WIDGET_ALIGN_BOTH then
-        limitMin.posY = padding[1]
-        limitMin.highPosY = padding[3]
+        limitMin.posY = 0
+        limitMin.highPosY = 0
 
     elseif place.alignY == WIDGET_ALIGN_LOW_ABS then
-        limitMin.posY =
-            padding[1]
-            * screen.realSizeY
-            / screen.fullVirtualSizeY
+        limitMin.posY = 0
 
         limitMax.posY =
-            ( ParentSize.sizeY - sizeY - padding[3] )
+            ( ParentSize.sizeY - sizeY )
             * screen.realSizeY
             / screen.fullVirtualSizeY
     end
