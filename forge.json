@@ -3,8 +3,7 @@
     "type": "Library",
     "execute": {
         "unpack": [
-            "src/DnDManager.lua",
-            "src/DnDManagerExtends.lua"
+            "src/DnDManager.lua"
         ]
     },
     "files": {
