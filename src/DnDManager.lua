@@ -1,7 +1,17 @@
 --------------------------------------------------------------------------------
--- src/DnDManager.lua
--- ООП менеджер Drag & Drop для виджетов.
--- ForgePackage "require Alfa-ao/DnDManager"
+--[[
+DnDManager.lua - ООП менеджер Drag & Drop для виджетов.
+
+Класс DnDManager реализует следующие методы:
+    self.Init
+    self.Register            - Регистрация виджета.
+    self.Unregister          - Удаление виджета из менеджера.
+    self.SetEnabled          - Включение/отключение возможности перетаскивания.
+    self.AllocateDnDID       - Генерация уникального DnD ID для виджета.
+    self.GetWidgetID         - Поиск dndId по любому из связанных виджетов.
+    self.IsDragActive        - Проверка наличия активного перетаскивания.
+    self.UnregisterAllEvents - Полная дерегистрация всех событий.
+]]
 --------------------------------------------------------------------------------
 
 --- @class DnDManager
@@ -25,8 +35,6 @@ Class( "DnDManager", {
     _options = nil,
 } )
 
-
-
 --------------------------------------------------------------------------------
 --- Инициализация менеджера.
 --- @param params table|nil
@@ -39,10 +47,6 @@ function DnDManager:Init( params )
     self._initialized = true
 
     self._options = {
-        -- true (по умолчанию): менеджер сам зарегистрирует события.
-        -- false: события регистрируются вручную через OnPickAttempt, OnDragTo и т.д.
-        autoRegisterEvents = params.autoRegisterEvents ~= false,
-
         -- nil: использовать дефолтный конфиг.
         -- table: использовать кастомный configProvider.
         configProvider = nil,
@@ -82,12 +86,8 @@ function DnDManager:Init( params )
     self._eventHandlers = {}
     self._screenParams = common.GetPosConverterParams()
     
-    if self._options.autoRegisterEvents then
-        self:_RegisterAllEvents()
-    end
+    self:_RegisterAllEvents()
 end
-
-
 
 --------------------------------------------------------------------------------
 --- @class DndRegisterOptions
@@ -97,7 +97,6 @@ end
 --- @field kbFlag number|nil Флаг клавиш KBF_*.
 --- @field cursor string|nil Курсор во время перетаскивания. См. названия курсоров "Аллоды Онлайн/data/Packs/Interface.Mini.pak/Interface/System/Cursors"
 
---- Регистрация виджета.
 --- @param wtMovable userdata|table Перемещаемый виджет.
 --- @param options DndRegisterOptions|nil Настройки регистрации.
 --- @return number dndId ID зарегистрированного виджета.
@@ -134,7 +133,7 @@ function DnDManager:Register( wtMovable, options )
         enabled = true,
         saveToConfig = options.saveToConfig == true,              -- По умолчанию false.
         lockedToParentArea = options.lockedToParentArea ~= false, -- По умолчанию true.
-        kbFlag = type( options.kbFlag ) == "number" and options.kbFlag or false,     -- По умолчанию false. Ограничения отключены.
+        kbFlag = type( options.kbFlag ) == "number" and options.kbFlag or false, -- По умолчанию false. Ограничения отключены.
         cursor = cursor,                                          -- По умолчанию "default". Имена в нижнем регистре.
         configName = nil,
     }
@@ -165,8 +164,6 @@ function DnDManager:Register( wtMovable, options )
 
     return dndId
 end
-
-
 
 --------------------------------------------------------------------------------
 --- Удаление виджета из менеджера
@@ -203,8 +200,6 @@ function DnDManager:Unregister( wtWidget )
     self._widgets[ dndId ] = nil
 end
 
-
-
 --------------------------------------------------------------------------------
 --- Включение/отключение возможности перетаскивания
 --- @param wtWidget any Сам виджет
@@ -237,8 +232,6 @@ function DnDManager:SetEnabled( wtWidget, isEnabled )
     info.wtReacting:DNDEnable( isEnabled )
 end
 
-
-
 --------------------------------------------------------------------------------
 --- Генерирует уникальный DnD ID для виджета.
 --- @param wtWidget userdata|table Виджет.
@@ -247,8 +240,6 @@ end
 function DnDManager:AllocateDnDID( wtWidget )
     return wtWidget:GetId() * DND_CONTAINER_STEP + DND_GENERIC_WIDGET_USER
 end
-
-
 
 --------------------------------------------------------------------------------
 --- Ищет dndId по любому из связанных виджетов.
@@ -265,8 +256,6 @@ function DnDManager:GetWidgetID( wtWidget )
     return nil
 end
 
-
-
 --------------------------------------------------------------------------------
 --- Активное перетаскивание считается активным с момента подтверждения
 --- EVENT_DND_PICK_ATTEMPT и до EVENT_DND_DROP_ATTEMPT или EVENT_DND_DRAG_CANCELLED.
@@ -275,58 +264,6 @@ end
 function DnDManager:IsDragActive()
     return self._activeDrag ~= nil and self._activeDrag.info ~= nil
 end
-
-
-
---------------------------------------------------------------------------------
---- Событие: попытка начать перетаскивание.
---- @param params table Параметры события EVENT_DND_PICK_ATTEMPT.
---------------------------------------------------------------------------------
-function DnDManager:OnPickAttempt( params )
-    self:_HandlePickAttempt( params )
-end
-
-
-
---------------------------------------------------------------------------------
---- Событие: перемещение курсора во время перетаскивания.
---- @param params table Параметры события EVENT_DND_DRAG_TO.
---------------------------------------------------------------------------------
-function DnDManager:OnDragTo( params )
-    self:_HandleDragTo( params )
-end
-
-
-
---------------------------------------------------------------------------------
---- Событие: попытка завершить перетаскивание.
---- @param params table Параметры события EVENT_DND_DROP_ATTEMPT.
---------------------------------------------------------------------------------
-function DnDManager:OnDropAttempt( params )
-    self:_HandleDropAttempt( params )
-end
-
-
-
---------------------------------------------------------------------------------
---- Событие: отмена перетаскивания.
---- EVENT_DND_DRAG_CANCELLED.
---------------------------------------------------------------------------------
-function DnDManager:OnDragCancelled()
-    self:_HandleDragCancelled()
-end
-
-
-
---------------------------------------------------------------------------------
---- Событие: изменение параметров экрана / масштабирования UI.
---- EVENT_POS_CONVERTER_CHANGED.
---------------------------------------------------------------------------------
-function DnDManager:OnPosConverterChanged()
-    self:_HandlePosConverterChanged()
-end
-
-
 
 --------------------------------------------------------------------------------
 --- Полная дерегистрация всех событий.
@@ -341,46 +278,41 @@ function DnDManager:UnregisterAllEvents()
     self._eventHandlers = {}
 end
 
-
-
 --------------------------------------------------------------------------------
 --- Регистрация всех глобальных событий.
---- Вызывается только если autoRegisterEvents == true.
 --------------------------------------------------------------------------------
 function DnDManager:_RegisterAllEvents()
     self._eventHandlers = {
         {
-            function( params ) self:OnPickAttempt( params ) end,
+            self.OnPickAttempt,
             "EVENT_DND_PICK_ATTEMPT"
         },
         {
-            function( params ) self:OnDragTo( params ) end,
+            self.OnDragTo,
             "EVENT_DND_DRAG_TO"
         },
         {
-            function( params ) self:OnDropAttempt( params ) end,
+            self.OnDropAttempt,
             "EVENT_DND_DROP_ATTEMPT"
         },
         {
-            function() self:OnDragCancelled() end,
+            self.OnDragCancelled,
             "EVENT_DND_DRAG_CANCELLED"
         },
         {
-            function() self:OnPosConverterChanged() end,
+            self.OnPosConverterChanged,
             "EVENT_POS_CONVERTER_CHANGED"
         },
     }
 
-    advEvent.RegisterEventHandlers( false, self._eventHandlers )
+    advEvent.RegisterEventHandlers( self, self._eventHandlers )
 end
-
-
 
 --------------------------------------------------------------------------------
 --- Событие: попытка начать перетаскивание.
 --- @param params table Параметры события EVENT_DND_PICK_ATTEMPT.
 --------------------------------------------------------------------------------
-function DnDManager:_HandlePickAttempt( params )
+function DnDManager:OnPickAttempt( params )
     local dndId = params.srcId
     local info = self._widgets[ dndId ]
 
@@ -419,8 +351,6 @@ function DnDManager:_HandlePickAttempt( params )
     info.wtReacting:DNDConfirmPickAttempt()
 end
 
-
-
 --------------------------------------------------------------------------------
 --- Проверяет, является ли объект виджетом.
 --- Поддерживаются обычные Widget и TWidget.
@@ -435,17 +365,26 @@ function DnDManager:_IsWidget( widget )
     if common.IsWidget( widget ) then
         return true
     end
+    
+    if type( widget ) ~= "table" or type( rawget( _G, "IsTWidget" ) ) ~= "function" then
+        return false
+    end
 
-    local isTWidget = rawget( _G, "IsTWidget" )
-
-    if type( isTWidget ) == "function" then
-        return isTWidget( widget )
+    local meta = getmetatable( widget )
+    if not meta then
+        return false
+    end
+    
+    local _id = rawget( meta, "id" )
+    local _widget = rawget( meta, "widget" )
+    
+    -- Проверяется наличие полей и то, что widget является нативным виджетом
+    if _id and _widget and common.IsWidget( _widget ) then
+        return GetTWidgetById( id ) == val
     end
 
     return false
 end
-
-
 
 --------------------------------------------------------------------------------
 --- Валидирует виджет и бросает ошибку, если это не виджет.
@@ -455,8 +394,6 @@ end
 function DnDManager:_ValidateWidget( widget, argName )
     assert( self:_IsWidget( widget ), "FATAL: Widget expected for %s, got %s", argName, apitype( widget ) )
 end
-
-
 
 --------------------------------------------------------------------------------
 --- Проверяет, подходит ли флаг клавиш из события под требуемый модификатор KBF_*.
@@ -481,13 +418,11 @@ function DnDManager:_CheckKbFlag( requiredKbFlag, eventKbFlags )
     return bit.band( eventKbFlags, requiredKbFlag ) ~= 0
 end
 
-
-
 --------------------------------------------------------------------------------
 --- Событие: Отпускание кнопки мыши
 --- @param params table Параметры события EVENT_DND_DROP_ATTEMPT.
 --------------------------------------------------------------------------------
-function DnDManager:_HandleDropAttempt( params )
+function DnDManager:OnDropAttempt( params )
     if not self:IsDragActive() then
         return
     end
@@ -501,16 +436,12 @@ function DnDManager:_HandleDropAttempt( params )
     self:_StopDragging( true )
 end
 
-
-
 --------------------------------------------------------------------------------
 --- Событие: Отмена перетаскивания
 --------------------------------------------------------------------------------
-function DnDManager:_HandleDragCancelled()
+function DnDManager:OnDragCancelled()
     self:_StopDragging( false )
 end
-
-
 
 --------------------------------------------------------------------------------
 --- Завершение процесса перетаскивания.
@@ -538,8 +469,6 @@ function DnDManager:_StopDragging( success )
 
     common.SetCursor( "default" )
 end
-
-
 
 --------------------------------------------------------------------------------
 --- Возвращает виртуальный размер родителя виджета.
@@ -581,8 +510,6 @@ function DnDManager:_GetParentRealSize( wtWidget )
 
     return ParentSize, ParentRect
 end
-
-
 
 --------------------------------------------------------------------------------
 --- Расчёт границ родителя ( limitMin, limitMax ) с учётом alignX / alignY
@@ -666,8 +593,6 @@ function DnDManager:_PrepareLimits( info, place )
     }
 end
 
-
-
 --------------------------------------------------------------------------------
 --- Нормализация placement в пределах рассчитанных лимитов.
 --- @param Place table WidgetPlacement.
@@ -701,14 +626,12 @@ function DnDManager:_NormalizePlacement( Place, limitMin, limitMax )
     return Place
 end
 
-
-
 --------------------------------------------------------------------------------
 --- Событие: Перемещение курсора во время перетаскивания
 --- Документация: EVENT_DND_DRAG_TO может прийти после окончания drag&drop.
 --- @param params table
 --------------------------------------------------------------------------------
-function DnDManager:_HandleDragTo( params )
+function DnDManager:OnDragTo( params )
     if not self:IsDragActive() then
         return
     end
@@ -753,12 +676,10 @@ function DnDManager:_HandleDragTo( params )
     common.SetCursor( state.info.cursor )
 end
 
-
-
 --------------------------------------------------------------------------------
 --- Событие: Изменение разрешения экрана / масштаба
 --------------------------------------------------------------------------------
-function DnDManager:_HandlePosConverterChanged()
+function DnDManager:OnPosConverterChanged()
     -- если прямо сейчас что-то тащится, стопорится.
     if self:IsDragActive() then
         local currentDNDState = self._activeDrag.info.wtReacting:DNDGetState()
@@ -781,7 +702,6 @@ function DnDManager:_HandlePosConverterChanged()
     end
 end
 
-
 --------------------------------------------------------------------------------
 --- Сохранение WidgetPlacementLua в конфиг.
 --- @param name string Имя ключа.
@@ -796,8 +716,6 @@ function DnDManager:_SaveConfig( name, plc )
     
     self._options.configProvider.set( config )
 end
-
-
 
 --------------------------------------------------------------------------------
 --- Загрузка WidgetPlacementLua из конфига.
@@ -829,8 +747,6 @@ function DnDManager:_LoadConfig( info )
 
     info.wtMovable:SetPlacementPlain( plc )
 end
-
-
 
 --------------------------------------------------------------------------------
 --- Генерация уникального пути виджета для имени конфига
