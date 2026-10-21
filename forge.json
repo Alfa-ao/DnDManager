@@ -8,7 +8,9 @@
     },
     "files": {
         "/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua": 100,
-        "/Mods/SampleCommon/CoreScripts/AdvancedHandlersUserMods.lua": 95,
+        "/Mods/SampleCommon/CoreScripts/AddonBaseUserMods.lua": 100,
+        "/Mods/SampleCommon/CoreScripts/AddonBase.lua": 100,
+        "/Mods/SampleCommon/CoreScripts/AdvancedHandlersUserMods.lua": 100,
 		"src/DnDManager.lua": 20
     }
 }
