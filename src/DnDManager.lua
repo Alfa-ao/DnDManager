@@ -172,8 +172,8 @@ function DnDManager:Register( wtMovable, options, resizeHandles )
 end
 
 --------------------------------------------------------------------------------
---- Регистрация виджета-ручки для изменения размера основного виджета.
---- @param wtHandle userdata|table Виджет-ручка для растягивания.
+--- Регистрация маркера для изменения размера основного виджета.
+--- @param wtHandle userdata|table Маркер для растягивания.
 --- @param allowX boolean Разрешить изменение размера по оси X.
 --- @param allowY boolean Разрешить изменение размера по оси Y.
 --- @param limitsX table|nil Допустимые размеры по оси X { min = number, max = number }.
@@ -769,7 +769,7 @@ end
 --------------------------------------------------------------------------------
 --- Метод обработки растягивания для одной оси.
 --- @param plc table Текущий WidgetPlacementLua виджета.
---- @param handlePlc table WidgetPlacementLua виджета-ручки.
+--- @param handlePlc table WidgetPlacementLua маркера.
 --- @param K string Буква оси ('X' или 'Y').
 --- @param delta number Смещение курсора по оси с учётом масштаба.
 --- @param limits table Допустимые размеры.

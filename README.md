@@ -26,7 +26,6 @@ dndManager:Register( wtPanel2, {
 } )
 ```
 
-## Смотрите также
+---
 
-- [Описание методов](https://github.com/Alfa-ao/DnDManager/wiki/Описание-методов)
-- [Расширение класса](https://github.com/Alfa-ao/DnDManager/wiki/Расширение-класса)
+[Справочник](https://github.com/Alfa-ao/DnDManager/wiki)

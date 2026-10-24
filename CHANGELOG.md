@@ -5,7 +5,7 @@
 ## [v1.4.0](https://github.com/Alfa-ao/DnDManager/releases/tag/v1.4.0)
 
 ### Added
-- Добавлена поддержка изменения размера виджета `Resize` с помощью виджетов-ручек (resize handles).
+- Добавлена поддержка изменения размера виджета `Resize` с помощью маркеров (resize handles).
 - Добавлен новый параметр `resizeHandles` в метод `Register`.
 - Добавлены приватные методы для регистрации и обработки растягивания: `_RegisterResizeHandle`, `_ProcessResize`, `_ProcessResizeAxis`.
 - Добавлена поддержка callback-функции `resizeCallback`, вызываемой после успешного завершения изменения размера.
@@ -13,7 +13,6 @@
 ### Changed
 - Изменена структура состояния активного перетаскивания `_activeDrag`: поля `resetPlacement` и `currentPlacement` заменены на единое `startPlacement`.
 - Логика обработки события `EVENT_DND_DRAG_TO` в методе `OnDragTo` разделена на два направления: `_ProcessDrag` для стандартного перемещения и `_ProcessResize` для изменения размера.
-- В методе `_StopDragging` итоговый `placement` теперь получается через `widget:GetPlacementPlain()` перед сохранением в конфиг, что позволяет корректно учесть изменения, внесенные callback-функциями.
 
 
 
