@@ -914,6 +914,19 @@ function DnDManager:_SaveConfig( name, plc )
 	if not name then return end
     
     local config = self._options.configProvider.get() or {}
+    
+    if plc.alignX == WIDGET_ALIGN_HIGH then
+        plc.posX = 0
+    elseif plc.alignX == WIDGET_ALIGN_LOW or plc.alignX == WIDGET_ALIGN_CENTER then
+        plc.highPosX = 0
+    end
+    
+    if plc.alignY == WIDGET_ALIGN_HIGH then
+        plc.posY = 0
+    elseif plc.alignY == WIDGET_ALIGN_LOW or plc.alignY == WIDGET_ALIGN_CENTER then
+        plc.highPosY = 0
+    end
+    
 	config[ name ] = plc
     config.DnD_CONFIG_VERSION = self.__CONFIG_VERSION
     self._options.configProvider.set( config )
@@ -938,9 +951,13 @@ function DnDManager:_LoadConfig( info )
     
     local plc = info.wtMovable:GetPlacementPlain()
     
-    for k, v in pairs( config ) do
-        plc[k] = v
+    if config.alignX ~= plc.alignX or config.alignY ~= plc.alignY then
+        LogWarning( "DndManager:_LoadConfig alignment discrepancy detected." )
+        config.alignX = plc.alignX
+        config.alignY = plc.alignY
     end
+    
+    plc = config
     
     if info.lockedToParentArea then
         local limits = self:_PrepareLimits( info, plc )
