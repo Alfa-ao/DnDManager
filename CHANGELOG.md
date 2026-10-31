@@ -2,12 +2,16 @@
 
 Все перечисленные изменения в релизе.
 
+
+
 ## [v1.4.3](https://github.com/Alfa-ao/DnDManager/releases/tag/v1.4.3)
 
 ### Fixed
 
 Исправлена некорректная позиция виджета при изменении масштаба или разрешения экрана `EVENT_POS_CONVERTER_CHANGED`.
 Исправлено ограничение перемещения для выравнивания `WIDGET_ALIGN_LOW_ABS` в `_RestrictPlacement`.
+
+
 
 ## [v1.4.2](https://github.com/Alfa-ao/DnDManager/releases/tag/v1.4.2)
 
@@ -24,6 +28,8 @@
 - В методе `OnDragTo` вызов `common.SetCursor` теперь выполняется только если курсор отличается от `"default"`.
 - Упрощен метод `IsDragActive`.
 - В методе `Register` удален блок принудительной отмены перетаскивания `DNDCancelDrag` перед регистрацией, теперь при попытке зарегистрировать уже активный виджет сразу выбрасывается ошибка.
+
+
 
 ## [v1.4.1](https://github.com/Alfa-ao/DnDManager/releases/tag/v1.4.1)
 
