@@ -2,6 +2,22 @@
 
 Все перечисленные изменения в релизе.
 
+## [v1.4.2](https://github.com/Alfa-ao/DnDManager/releases/tag/v1.4.2)
+
+### Added
+Добавлена автоматическая блокировка изменения размера по оси в `_RegisterResizeHandle`, если маркер имеет выравнивание `WIDGET_ALIGN_CENTER`.
+
+### Changed
+- Упрощена и оптимизирована логика ограничения перемещения и изменения размера в пределах родителя.
+    - Удалены методы `_PrepareLimits` и `_NormalizePlacement`.
+    - Добавлен новый упрощенный метод `_RestrictPlacement` для ограничения `WidgetPlacementLua`.
+- Метод `_ProcessResizeAxis` переименован в `_ResizeAxis` и очищен от избыточной логики ограничения границами. Теперь это делается централизованно в `_RestrictPlacement`.
+- Упрощен метод `_GetParentRealSize`. Теперь возвращает единую таблицу `{ sizeX, sizeY }` вместо двух отдельных значений.
+- Вспомогательные функции `IsWidget`, `GetWidgetTreePath` и `InvokeCallback` вынесены "локальные функции".
+- В методе `OnDragTo` вызов `common.SetCursor` теперь выполняется только если курсор отличается от `"default"`.
+- Упрощен метод `IsDragActive`.
+- В методе `Register` удален блок принудительной отмены перетаскивания `DNDCancelDrag` перед регистрацией, теперь при попытке зарегистрировать уже активный виджет сразу выбрасывается ошибка.
+
 ## [v1.4.1](https://github.com/Alfa-ao/DnDManager/releases/tag/v1.4.1)
 
 ### Changed
