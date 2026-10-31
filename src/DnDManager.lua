@@ -186,6 +186,7 @@ function DnDManager:Register( wtMovable, options, resizeHandles )
         lockedToParentArea = options.lockedToParentArea ~= false, -- По умолчанию true.
         kbFlag = type( options.kbFlag ) == "number" and options.kbFlag or false, -- По умолчанию false. Ограничения отключены.
         cursor = options.cursor, -- По умолчанию "default". Имена в нижнем регистре.
+        savedPlacement = wtMovable:GetPlacementPlain()
     }
 
     if info.saveToConfig then
@@ -593,9 +594,13 @@ end
 --------------------------------------------------------------------------------
 function DnDManager:_RestrictPlacement( place, parentSize )
     local sizeX, sizeY = place.sizeX, place.sizeY
-    
+    local scaleX = self._screenParams.realSizeX / self._screenParams.fullVirtualSizeX
+    local scaleY = self._screenParams.realSizeY / self._screenParams.fullVirtualSizeY
+
     if place.alignX == WIDGET_ALIGN_LOW or place.alignX == WIDGET_ALIGN_LOW_ABS then
-        place.posX = math.max( 0, math.min( parentSize.sizeX - sizeX, place.posX ) )
+        local maxX = ( place.alignX == WIDGET_ALIGN_LOW_ABS )
+            and ( parentSize.sizeX - sizeX ) * scaleX or ( parentSize.sizeX - sizeX )
+        place.posX = math.max( 0, math.min( maxX, place.posX ) )
     elseif place.alignX == WIDGET_ALIGN_HIGH then
         place.highPosX = math.max( 0, math.min( parentSize.sizeX - sizeX, place.highPosX ) )
     elseif place.alignX == WIDGET_ALIGN_CENTER then
@@ -605,9 +610,11 @@ function DnDManager:_RestrictPlacement( place, parentSize )
         place.posX = math.max( 0, place.posX )
         place.highPosX = math.max( 0, place.highPosX )
     end
-    
+
     if place.alignY == WIDGET_ALIGN_LOW or place.alignY == WIDGET_ALIGN_LOW_ABS then
-        place.posY = math.max( 0, math.min( parentSize.sizeY - sizeY, place.posY ) )
+        local maxY = ( place.alignY == WIDGET_ALIGN_LOW_ABS ) 
+            and ( parentSize.sizeY - sizeY ) * scaleY or ( parentSize.sizeY - sizeY )
+        place.posY = math.max( 0, math.min( maxY, place.posY ) )
     elseif place.alignY == WIDGET_ALIGN_HIGH then
         place.highPosY = math.max( 0, math.min( parentSize.sizeY - sizeY, place.highPosY ) )
     elseif place.alignY == WIDGET_ALIGN_CENTER then
@@ -665,16 +672,16 @@ function DnDManager:_StopDragging( success )
             InvokeCallback( state.info.resizeCallback, state.info.wtMovable )
         end
         
-        local finalPlacement = state.info.wtMovable:GetPlacementPlain()
+        state.info.savedPlacement = state.info.wtMovable:GetPlacementPlain()
         
         if state.info.lockedToParentArea then
-            self:_RestrictPlacement( finalPlacement, state.parentSize )
+            self:_RestrictPlacement( state.info.savedPlacement, state.parentSize )
         end
         
-        state.info.wtMovable:SetPlacementPlain( finalPlacement )
+        state.info.wtMovable:SetPlacementPlain( state.info.savedPlacement )
         
         if state.info.saveToConfig then
-            self:_SaveConfig( state.info.configName, finalPlacement )
+            self:_SaveConfig( state.info.configName, state.info.savedPlacement )
         end
     else
         state.info.wtMovable:SetPlacementPlain( state.startPlacement )
@@ -724,7 +731,7 @@ function DnDManager:OnPosConverterChanged()
     
     for _, info in pairs( self._widgets ) do
         if info.lockedToParentArea then
-            local place = info.wtMovable:GetPlacementPlain()
+            local place = table.sclone( info.savedPlacement )
             self:_RestrictPlacement( place, self:_GetParentRealSize( info.wtMovable ) )
             info.wtMovable:SetPlacementPlain( place )
         end

@@ -2,6 +2,13 @@
 
 Все перечисленные изменения в релизе.
 
+## [v1.4.3](https://github.com/Alfa-ao/DnDManager/releases/tag/v1.4.3)
+
+### Fixed
+
+Исправлена некорректная позиция виджета при изменении масштаба или разрешения экрана `EVENT_POS_CONVERTER_CHANGED`.
+Исправлено ограничение перемещения для выравнивания `WIDGET_ALIGN_LOW_ABS` в `_RestrictPlacement`.
+
 ## [v1.4.2](https://github.com/Alfa-ao/DnDManager/releases/tag/v1.4.2)
 
 ### Added
