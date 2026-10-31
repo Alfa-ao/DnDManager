@@ -782,12 +782,10 @@ function DnDManager:_LoadConfig( info )
         config.alignX = place.alignX
         config.alignY = place.alignY
     end
-    
-    place = config
-    
+	
     if info.lockedToParentArea then
-        self:_RestrictPlacement( place, self:_GetParentRealSize( info.wtMovable ) )
+        self:_RestrictPlacement( config, self:_GetParentRealSize( info.wtMovable ) )
     end
 
-    info.wtMovable:SetPlacementPlain( place )
+    info.wtMovable:SetPlacementPlain( config )
 end
