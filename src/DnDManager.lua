@@ -4,13 +4,14 @@ DnDManager.lua - ООП менеджер Drag&Drop и Resize для виджет
 
 Класс DnDManager реализует следующие методы:
     self.Init
-    self.Register            - Регистрация виджета с его дополнительными настройками.
-    self.Unregister          - Удаление виджета из менеджера.
-    self.SetEnabled          - Включение/отключение возможности перетаскивания.
-    self.AllocateDnDID       - Генерация уникального DnD ID для виджета.
-    self.GetWidgetID         - Поиск dndId по любому из связанных виджетов.
-    self.IsDragActive        - Проверка наличия активного перетаскивания.
-    self.UnregisterAllEvents - Полная дерегистрация всех событий.
+    self.Register             - Регистрация виджета с его дополнительными настройками.
+    self.Unregister           - Удаление виджета из менеджера.
+    self.SetEnabled           - Включение/отключение возможности перетаскивания.
+    self.AllocateDnDID        - Генерация уникального DnD ID для виджета.
+    self.GetWidgetID          - Поиск dndId по любому из связанных виджетов.
+    self.IsDragActive         - Проверка наличия активного перетаскивания.
+    self.UnregisterAllEvents  - Полная дерегистрация всех событий.
+    self.UpdateSavedPlacement - Нужен после программного изменения размера виджета извне.
 ]]
 --------------------------------------------------------------------------------
 
@@ -186,13 +187,14 @@ function DnDManager:Register( wtMovable, options, resizeHandles )
         lockedToParentArea = options.lockedToParentArea ~= false, -- По умолчанию true.
         kbFlag = type( options.kbFlag ) == "number" and options.kbFlag or false, -- По умолчанию false. Ограничения отключены.
         cursor = options.cursor, -- По умолчанию "default". Имена в нижнем регистре.
-        savedPlacement = wtMovable:GetPlacementPlain()
     }
 
     if info.saveToConfig then
         info.configName = "DnD:" .. GetWidgetTreePath( wtMovable ) -- DnD:Main.Panel
         self:_LoadConfig( info )
     end
+    
+    info.savedPlacement = wtMovable:GetPlacementPlain()
     
     self._widgets[ dndId ] = info
     
@@ -202,10 +204,8 @@ function DnDManager:Register( wtMovable, options, resizeHandles )
         for _, handleData in ipairs( resizeHandles ) do
             self:_RegisterResizeHandle(
                 handleData.wtHandle,
-                handleData.allowX,
-                handleData.allowY,
-                handleData.limitsX,
-                handleData.limitsY,
+                handleData.allowX, handleData.allowY,
+                handleData.limitsX, handleData.limitsY,
                 handleData.callback,
                 info
             )
@@ -225,19 +225,21 @@ end
 --- @param callback function|table|nil Функция или таблица с функцией обратного вызова после изменения размера
 --- @param baseInfo table Информация об основном виджете для настроек
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function DnDManager:_RegisterResizeHandle( wtHandle, allowX, allowY, limitsX, limitsY, callback, baseInfo )
     limitsX = type( limitsX ) == "table" and limitsX or {}
     limitsY = type( limitsY ) == "table" and limitsY or {}
     
     self:_ValidateWidget( wtHandle, "wtHandle" )
+    
     local dndId = self:AllocateDnDID( wtHandle )
+    local handlePlc = wtHandle:GetPlacementPlain()
     
     assert( self._widgets[ dndId ] == nil, "DnDManager: handle is already registered, dndId = %s", dndId )
     assert( wtHandle:DNDGetState() == DND_STATE_NOT_REGISTERED, "DnDManager: handle already registered in DND system" )
     
     wtHandle:DNDRegister( dndId, true )
     
-    local handlePlc = wtHandle:GetPlacementPlain()
     if handlePlc.alignX == WIDGET_ALIGN_CENTER then
         allowX = false
     end
@@ -311,13 +313,8 @@ function DnDManager:SetEnabled( wtWidget, isEnabled )
     local info = self._widgets[ dndId ]
     isEnabled = isEnabled == true
     
-    if not isEnabled
-        and self:IsDragActive()
-        and self._activeDrag.info.dndId == dndId 
-    then
-        local currentDNDState = info.wtReacting:DNDGetState()
-
-        if currentDNDState ~= DND_STATE_NOT_REGISTERED then
+    if not isEnabled and self:IsDragActive() and self._activeDrag.info.dndId == dndId then
+        if info.wtReacting:DNDGetState() ~= DND_STATE_NOT_REGISTERED then
             info.wtReacting:DNDCancelDrag()
         end
 
@@ -420,8 +417,7 @@ function DnDManager:_CheckKbFlag( requiredKbFlag, eventKbFlags )
     if requiredKbFlag == KBF_NONE then
         return eventKbFlags == KBF_NONE
     end
-
-    -- Требуется конкретный модификатор Shift/Ctrl/Alt
+    
     return bit.band( eventKbFlags, requiredKbFlag ) ~= 0
 end
 
@@ -438,14 +434,9 @@ end
 function DnDManager:OnPickAttempt( params )
     local info = self._widgets[ params.srcId ]
 
-    if not info or not info.enabled or self:IsDragActive() then
-        return
-    end
-    
+    if not info or not info.enabled or self:IsDragActive() then return end
     -- Проверка модификаторов клавиатуры 
-    if not self:_CheckKbFlag( info.kbFlag, params.kbFlags ) then
-        return
-    end
+    if not self:_CheckKbFlag( info.kbFlag, params.kbFlags ) then return end
     
     self._activeDrag = {
         info = info,
@@ -659,9 +650,7 @@ end
 --- @param success boolean Успешно ли завершено перетаскивание.
 --------------------------------------------------------------------------------
 function DnDManager:_StopDragging( success )
-    if not self._activeDrag then
-        return
-    end
+    if not self._activeDrag then return end
     
     local state = self._activeDrag
     
@@ -672,17 +661,14 @@ function DnDManager:_StopDragging( success )
             InvokeCallback( state.info.resizeCallback, state.info.wtMovable )
         end
         
-        state.info.savedPlacement = state.info.wtMovable:GetPlacementPlain()
+        local place = state.info.wtMovable:GetPlacementPlain()
         
-        if state.info.lockedToParentArea then
-            self:_RestrictPlacement( state.info.savedPlacement, state.parentSize )
+        if state.parentSize then
+            self:_RestrictPlacement( place, state.parentSize )
         end
         
-        state.info.wtMovable:SetPlacementPlain( state.info.savedPlacement )
-        
-        if state.info.saveToConfig then
-            self:_SaveConfig( state.info.configName, state.info.savedPlacement )
-        end
+        state.info.wtMovable:SetPlacementPlain( place )
+        self:UpdateSavedPlacement( state.info.wtMovable )
     else
         state.info.wtMovable:SetPlacementPlain( state.startPlacement )
     end
@@ -693,7 +679,6 @@ end
 
 --------------------------------------------------------------------------------
 --- Возвращает виртуальный размер родителя виджета.
---- Если родителя нет - возвращает размер экрана.
 --- @param wtWidget userdata|table Виджет.
 --- @return table { sizeX = number, sizeY = number }
 --------------------------------------------------------------------------------
@@ -719,8 +704,7 @@ end
 --------------------------------------------------------------------------------
 function DnDManager:OnPosConverterChanged()
     if self:IsDragActive() then
-        local currentDNDState = self._activeDrag.info.wtReacting:DNDGetState()
-        if currentDNDState ~= DND_STATE_NOT_REGISTERED then
+        if self._activeDrag.info.wtReacting:DNDGetState() ~= DND_STATE_NOT_REGISTERED then
             self._activeDrag.info.wtReacting:DNDCancelDrag()
         end
         
@@ -730,11 +714,36 @@ function DnDManager:OnPosConverterChanged()
     self._screenParams = common.GetPosConverterParams()
     
     for _, info in pairs( self._widgets ) do
-        if info.lockedToParentArea then
-            local place = table.sclone( info.savedPlacement )
-            self:_RestrictPlacement( place, self:_GetParentRealSize( info.wtMovable ) )
-            info.wtMovable:SetPlacementPlain( place )
+        if info.lockedToParentArea and not info.isResize then
+            local saved = table.sclone( info.savedPlacement )
+            self:_RestrictPlacement( saved, self:_GetParentRealSize( info.wtMovable ) )
+            info.wtMovable:SetPlacementPlain( saved )
         end
+    end
+end
+
+--------------------------------------------------------------------------------
+--- Нужен после программного изменения размера виджета извне.
+--- @param wtWidget userdata|table Виджет
+--------------------------------------------------------------------------------
+function DnDManager:UpdateSavedPlacement( wtWidget )
+    self:_ValidateWidget( wtWidget, "wtWidget" )
+    local dndId = self:GetWidgetID( wtWidget )
+    if not dndId then return end
+    
+    local info = self._widgets[ dndId ]
+    if not info then return end
+    
+    local place = info.wtMovable:GetPlacementPlain()
+    
+    for _, widgetInfo in pairs( self._widgets ) do
+        if widgetInfo.wtMovable == info.wtMovable and not widgetInfo.isResize then
+            widgetInfo.savedPlacement = place
+        end
+    end
+    
+    if info.saveToConfig then
+        self:_SaveConfig( info.configName, place )
     end
 end
 
@@ -772,22 +781,17 @@ end
 function DnDManager:_LoadConfig( info )
 	local config = self._options.configProvider.get() or {}
     
-    if self.__CONFIG_VERSION ~= config.DnD_CONFIG_VERSION then
-        return
-    end
+    if self.__CONFIG_VERSION ~= config.DnD_CONFIG_VERSION then return end
     
     config = config[ info.configName ]
 
-    if not config or type( config ) ~= "table" then
-        return
-    end
+    if not config or type( config ) ~= "table" then return end
     
     local place = info.wtMovable:GetPlacementPlain()
     
     if config.alignX ~= place.alignX or config.alignY ~= place.alignY then
         LogWarning( "DndManager:_LoadConfig alignment discrepancy detected." )
-        config.alignX = place.alignX
-        config.alignY = place.alignY
+        config.alignX, config.alignY = place.alignX, place.alignY
     end
 	
     if info.lockedToParentArea then
