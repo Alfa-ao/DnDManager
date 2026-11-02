@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 --[[
-DnDManager.lua - ООП менеджер Drag&Drop и Resize для виджетов.
+DnDManager.lua - Менеджер Drag&Drop и Resize для виджетов.
 
 Класс DnDManager реализует следующие методы:
     self.Init
@@ -224,7 +224,6 @@ end
 --- @param limitsY table|nil Допустимые размеры по Y { min = number, max = number }
 --- @param callback function|table|nil Функция или таблица с функцией обратного вызова после изменения размера
 --- @param baseInfo table Информация об основном виджете для настроек
---------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function DnDManager:_RegisterResizeHandle( wtHandle, allowX, allowY, limitsX, limitsY, callback, baseInfo )
     limitsX = type( limitsX ) == "table" and limitsX or {}
@@ -494,7 +493,6 @@ end
 --- @param dx number Смещение курсора по оси X.
 --- @param dy number Смещение курсора по оси Y.
 --------------------------------------------------------------------------------
---- Обработка перемещения виджета.
 function DnDManager:_ProcessDrag( state, dx, dy )
     local place = state.info.wtMovable:GetPlacementPlain()
     
