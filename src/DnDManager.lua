@@ -20,9 +20,13 @@ Class( "DnDManager", {
     _widgets = {}, -- Хранилище зарегистрированных виджетов [ dndId ] = WidgetInfo
     _activeDrag = nil, -- Текущее состояние активного перетаскивания
     _eventHandlers = nil, -- Ссылки на коллбэки для отписки от событий
-    _screenParams = nil, -- Кэш параметров координат (разрешение экрана)
-    _initialized = false,
+    _screenParams = nil, -- Кэш параметров окна игры
 } )
+
+local _assert = assert
+local assert = function( is, fmt, ... )
+    _assert( is, string.format( fmt, ... ) )
+end
 
 --------------------------------------------------------------------------------
 --- Для Resize. Вызов callback
@@ -87,16 +91,10 @@ end
 function DnDManager:Init( params )
     params = type( params ) == "table" and params or {}
     
-    assert( not self._initialized, "DnDManager:Init() has already been called. Re-initialization is not allowed." )
-    
-    self._initialized = true
     self._screenParams = common.GetPosConverterParams()
-
     self._options = {
-        configProvider = nil,
         defaultCursor = type( params.defaultCursor ) == "string"
-            and params.defaultCursor
-            or "default",
+            and params.defaultCursor or "default",
     }
     
     if type( params.configProvider ) == "table" then
@@ -154,7 +152,6 @@ end
 --------------------------------------------------------------------------------
 function DnDManager:Register( wtMovable, options, resizeHandles )
     options = type( options ) == "table" and options or {}
-    assert( self._initialized, "DnDManager:Register() failed: call DnDManager:Init before registering widgets" )
     
     self:_ValidateWidget( wtMovable, "wtMovable" )
     
@@ -175,8 +172,7 @@ function DnDManager:Register( wtMovable, options, resizeHandles )
     
     options.wtReacting:DNDRegister( dndId, true )
     options.cursor = type( options.cursor ) == "string"
-            and options.cursor
-            or self._options.defaultCursor
+            and options.cursor or self._options.defaultCursor
 
     local info = {
         dndId = dndId,
@@ -313,10 +309,7 @@ function DnDManager:SetEnabled( wtWidget, isEnabled )
     isEnabled = isEnabled == true
     
     if not isEnabled and self:IsDragActive() and self._activeDrag.info.dndId == dndId then
-        if info.wtReacting:DNDGetState() ~= DND_STATE_NOT_REGISTERED then
-            info.wtReacting:DNDCancelDrag()
-        end
-
+        info.wtReacting:DNDCancelDrag()
         self:_StopDragging( false )
     end
     
@@ -365,26 +358,11 @@ end
 --------------------------------------------------------------------------------
 function DnDManager:_RegisterAllEvents()
     self._eventHandlers = {
-        { -- Попытка начать перетаскивание
-            self.OnPickAttempt,
-            "EVENT_DND_PICK_ATTEMPT"
-        },
-        { -- Перемещение курсора во время перетаскивания
-            self.OnDragTo,
-            "EVENT_DND_DRAG_TO"
-        },
-        { -- Отпускание кнопки мыши
-            self.OnDropAttempt,
-            "EVENT_DND_DROP_ATTEMPT"
-        },
-        { -- Завершение процесса перетаскивания
-            self.OnDragCancelled,
-            "EVENT_DND_DRAG_CANCELLED"
-        },
-        { -- Изменение разрешения экрана / масштаба
-            self.OnPosConverterChanged,
-            "EVENT_POS_CONVERTER_CHANGED"
-        },
+        { self.OnPickAttempt, "EVENT_DND_PICK_ATTEMPT" }, -- Попытка начать перетаскивание
+        { self.OnDragTo, "EVENT_DND_DRAG_TO" }, -- Перемещение курсора во время перетаскивания
+        { self.OnDropAttempt, "EVENT_DND_DROP_ATTEMPT" }, -- Отпускание кнопки мыши
+        { self.OnDragCancelled, "EVENT_DND_DRAG_CANCELLED" }, -- Завершение процесса перетаскивания
+        { self.OnPosConverterChanged, "EVENT_POS_CONVERTER_CHANGED" }, -- Изменение разрешения экрана / масштаба
     }
 
     advEvent.RegisterEventHandlers( self, self._eventHandlers )
@@ -427,6 +405,7 @@ end
 --- @field posX number - координата курсора по X (реальная).
 --- @field posY number - координата курсора по Y (реальная).
 --- @field kbFlags number - состояние модификаторов клавиатуры.
+
 --- - EVENT_DND_PICK_ATTEMPT Начало перетаскивания.
 --- @param params DnDPickAttemptParams
 --------------------------------------------------------------------------------
@@ -463,6 +442,7 @@ end
 --- @field posY number - координата курсора по Y (реальная).
 --- @field outside boolean - находится ли курсор за пределами окна приложения.
 --- @field kbFlags number - состояние модификаторов клавиатуры.
+
 --- - Перемещение курсора во время drag&drop.
 --- - Документация: EVENT_DND_DRAG_TO может прийти после окончания drag&drop.
 --- @param params DnDDragToParams
@@ -526,12 +506,15 @@ function DnDManager:_ProcessResize( state, dx, dy )
     local plc = table.sclone( state.startPlacement )
     local handlePlc = info.wtReacting:GetPlacementPlain()
     
-    local scaleX = ( plc.alignX ~= WIDGET_ALIGN_LOW_ABS ) and ( self._screenParams.fullVirtualSizeX / self._screenParams.realSizeX ) or 1
-    local scaleY = ( plc.alignY ~= WIDGET_ALIGN_LOW_ABS ) and ( self._screenParams.fullVirtualSizeY / self._screenParams.realSizeY ) or 1
+    local scaleX = ( plc.alignX ~= WIDGET_ALIGN_LOW_ABS ) 
+        and ( self._screenParams.fullVirtualSizeX / self._screenParams.realSizeX ) or 1
+    local scaleY = ( plc.alignY ~= WIDGET_ALIGN_LOW_ABS ) 
+        and ( self._screenParams.fullVirtualSizeY / self._screenParams.realSizeY ) or 1
     
     if info.resizeX then
         self:_ResizeAxis( plc, handlePlc, 'X', dx * scaleX, info.limitsX )
     end
+    
     if info.resizeY then
         self:_ResizeAxis( plc, handlePlc, 'Y', dy * scaleY, info.limitsY )
     end
@@ -558,7 +541,7 @@ function DnDManager:_ResizeAxis( plc, handlePlc, K, delta, limits )
     local alignK = "align" .. K
     local handleAlign = handlePlc[ alignK ]
     local sizeDelta = ( handleAlign == WIDGET_ALIGN_HIGH ) and delta or -delta
-    local newSize = math.max( limits.min, math.min( limits.max, plc[ sizeK ] + sizeDelta ) )
+    local newSize = math.clamp( plc[ sizeK ] + sizeDelta, limits.min, limits.max )
     local actualDelta = newSize - plc[ sizeK ]
     
     plc[ sizeK ] = newSize
@@ -572,46 +555,46 @@ function DnDManager:_ResizeAxis( plc, handlePlc, K, delta, limits )
     end
 end
 
+local AXIS_DESCRIPTORS = {
+    {
+        align = "alignX", pos = "posX", highPos = "highPosX", size = "sizeX", scaleKey = "scaleX",
+    },
+    {
+        align = "alignY", pos = "posY", highPos = "highPosY", size = "sizeY", scaleKey = "scaleY",
+    },
+}
 --------------------------------------------------------------------------------
 --- @class DndParentSize
 --- @field sizeX number Виртуальная ширина родителя.
 --- @field sizeY number Виртуальная высота родителя.
+
 --- Ограничение WidgetPlacementLua в пределах размера родителя
 --- @param place table WidgetPlacementLua, который требуется ограничить
 --- @param parentSize DndParentSize Виртуальный размер родителя
 --- @return table place Ограниченный WidgetPlacementLua
 --------------------------------------------------------------------------------
 function DnDManager:_RestrictPlacement( place, parentSize )
-    local sizeX, sizeY = place.sizeX, place.sizeY
-    local scaleX = self._screenParams.realSizeX / self._screenParams.fullVirtualSizeX
-    local scaleY = self._screenParams.realSizeY / self._screenParams.fullVirtualSizeY
-
-    if place.alignX == WIDGET_ALIGN_LOW or place.alignX == WIDGET_ALIGN_LOW_ABS then
-        local maxX = ( place.alignX == WIDGET_ALIGN_LOW_ABS )
-            and ( parentSize.sizeX - sizeX ) * scaleX or ( parentSize.sizeX - sizeX )
-        place.posX = math.max( 0, math.min( maxX, place.posX ) )
-    elseif place.alignX == WIDGET_ALIGN_HIGH then
-        place.highPosX = math.max( 0, math.min( parentSize.sizeX - sizeX, place.highPosX ) )
-    elseif place.alignX == WIDGET_ALIGN_CENTER then
-        local limit = ( parentSize.sizeX - sizeX ) / 2
-        place.posX = math.max( -limit, math.min( limit, place.posX ) )
-    elseif place.alignX == WIDGET_ALIGN_BOTH then
-        place.posX = math.max( 0, place.posX )
-        place.highPosX = math.max( 0, place.highPosX )
-    end
-
-    if place.alignY == WIDGET_ALIGN_LOW or place.alignY == WIDGET_ALIGN_LOW_ABS then
-        local maxY = ( place.alignY == WIDGET_ALIGN_LOW_ABS ) 
-            and ( parentSize.sizeY - sizeY ) * scaleY or ( parentSize.sizeY - sizeY )
-        place.posY = math.max( 0, math.min( maxY, place.posY ) )
-    elseif place.alignY == WIDGET_ALIGN_HIGH then
-        place.highPosY = math.max( 0, math.min( parentSize.sizeY - sizeY, place.highPosY ) )
-    elseif place.alignY == WIDGET_ALIGN_CENTER then
-        local limit = ( parentSize.sizeY - sizeY ) / 2
-        place.posY = math.max( -limit, math.min( limit, place.posY ) )
-    elseif place.alignY == WIDGET_ALIGN_BOTH then
-        place.posY = math.max( 0, place.posY )
-        place.highPosY = math.max( 0, place.highPosY )
+    local sp = self._screenParams
+    local scales = {
+        scaleX = sp.realSizeX / sp.fullVirtualSizeX,
+        scaleY = sp.realSizeY / sp.fullVirtualSizeY,
+    }
+    
+    for _, axis in ipairs( AXIS_DESCRIPTORS ) do
+        local align = place[ axis.align ]
+        local size = place[ axis.size ]
+        local parentSizeAxis = parentSize[ axis.size ]
+        local scale = scales[ axis.scaleKey ]
+        if align == WIDGET_ALIGN_LOW or align == WIDGET_ALIGN_LOW_ABS then
+            local maxVal = ( align == WIDGET_ALIGN_LOW_ABS )
+                and ( parentSizeAxis - size ) * scale or ( parentSizeAxis - size )
+            place[ axis.pos ] = math.clamp( place[ axis.pos ], 0, maxVal )
+        elseif align == WIDGET_ALIGN_HIGH then
+            place[ axis.highPos ] = math.clamp( place[ axis.highPos ], 0, parentSizeAxis - size )
+        elseif align == WIDGET_ALIGN_CENTER then
+            local limit = ( parentSizeAxis - size ) / 2
+            place[ axis.pos ] = math.clamp( place[ axis.pos ], -limit, limit )
+        end
     end
     
     return place
@@ -624,15 +607,13 @@ end
 --- @field targetWidget Widget|nil - виджет под курсором.
 --- @field targetId number - идентификатор DNDId или DND_INVALID_ID, связанный с виджетом под курсором.
 --- @field kbFlags number - состояние модификаторов клавиатуры.
+
 --- - EVENT_DND_DROP_ATTEMPT Попытка завершить drag&drop.
 --- @param params DnDDropAttemptParams
 --------------------------------------------------------------------------------
 function DnDManager:OnDropAttempt( params )
     if not self:IsDragActive() then return end
-
-    local state = self._activeDrag
-
-    if params.srcId ~= state.info.dndId then return end
+    if params.srcId ~= self._activeDrag.info.dndId then return end
 
     self:_StopDragging( true )
 end

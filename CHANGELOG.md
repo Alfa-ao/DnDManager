@@ -4,6 +4,17 @@
 
 
 
+## [v1.4.3.127](https://github.com/Alfa-ao/DnDManager/releases/tag/v1.4.3.127)
+
+- Рефакторинг.
+    - Удалена проверка `_initialized`.
+    - Стандартный `assert` при подключении `useCommonScripts = true` теряет свойство умного форматирования.
+    - `SetEnabled` - убрана избыточная проверка состояния `DNDGetState()`.
+    - Вызовы `math.max` и `math.min` заменены на `math.clamp`.
+    - Удалена бессмысленная обработка выравнивания `WIDGET_ALIGN_BOTH`.
+
+
+
 ## [v1.4.3](https://github.com/Alfa-ao/DnDManager/releases/tag/v1.4.3)
 
 ### Added
