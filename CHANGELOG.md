@@ -7,7 +7,7 @@
 ## [v1.4.3.133](https://github.com/Alfa-ao/DnDManager/releases/tag/v1.4.3.133)
 
 - Рефакторинг `DnDManager:OnPosConverterChanged()`.
-    - Исправлен недочет. Размер описателя `sizeX` и `sizeY` берутся актуальные.
+    - Исправлен недочет. Размер описателя `sizeX` и `sizeY` берется актуальный.
 
 
 
